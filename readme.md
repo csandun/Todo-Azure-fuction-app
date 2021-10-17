@@ -7,7 +7,7 @@ This is based on [Plurasight course](https://app.pluralsight.com/course-player?c
 - [x] Create todo api
 - [x] Get all todo api
 - [x] Get todo by id api
-- [ ] Update todo api
+- [x] Update todo api
 - [ ] Delete todo api
 
 

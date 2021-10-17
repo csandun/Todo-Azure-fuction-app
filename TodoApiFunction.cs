@@ -25,6 +25,8 @@ namespace CSandun.Todo
         }
 
         [FunctionName("CreateTodo")]
+        [OpenApiOperation(operationId: "CreateTodo")]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Todo))]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public async Task<IActionResult> CreateTodo(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "todos")] HttpRequest req)
@@ -37,6 +39,7 @@ namespace CSandun.Todo
         }
 
         [FunctionName("GetAllTodos")]
+        [OpenApiOperation(operationId: "GetAllTodos")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public IActionResult GetAllTodos(
            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "todos")] HttpRequest req)
@@ -45,6 +48,8 @@ namespace CSandun.Todo
         }
 
         [FunctionName("GetTodoById")]
+        [OpenApiOperation(operationId: "GetTodoById")]
+        [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "add todo id")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public IActionResult GetTodoById(
           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "todos/{id}")] HttpRequest req, long id)
@@ -55,6 +60,28 @@ namespace CSandun.Todo
             {
                 return new NotFoundObjectResult("Cannot found todo item");
             }
+
+            return new OkObjectResult(item);
+        }
+
+        [FunctionName("UpdateTodo")]
+        [OpenApiOperation(operationId: "UpdateTodo")]
+        [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "add todo id")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
+        public async Task<IActionResult> UpdateTodo(
+          [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "todos/{id}")] HttpRequest req, long id)
+        {
+            var item = items.FirstOrDefault(o => o.Id == id);
+
+            if (item == null)
+            {
+                return new NotFoundObjectResult("Cannot found todo item");
+            }
+
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var updated = JsonConvert.DeserializeObject<Todo>(requestBody);
+
+            item = updated;
 
             return new OkObjectResult(item);
         }
